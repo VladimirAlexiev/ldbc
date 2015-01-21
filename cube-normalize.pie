@@ -7,6 +7,12 @@ Prefices
 
 Rules
 {
+  Id: qbX_slice_observation_dataSet
+    dataset <qb:slice>       slice
+    slice   <qb:observation> obs
+    ------------------------------
+    obs     <qb:dataSet>     dataset
+
 
   Id: qb2_Dataset_attachments
     spec    <qb:componentProperty> comp
@@ -52,8 +58,7 @@ Rules
     measure <rdf:type> <qb:MeasureProperty>
     measure comp value
     obs     <qb:dataSet> dataset
-    obs     measure struc
-    struc
+    obs     measure blank
     --------------------------
     obs  comp value
 

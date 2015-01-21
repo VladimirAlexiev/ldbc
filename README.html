@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>LDBC Benchmarking Ontology</title>
-<!-- 2015-01-21 Wed 02:49 -->
+<!-- 2015-01-21 Wed 03:20 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Vladimir Alexiev, Ontotext Corp" />
@@ -1266,8 +1266,8 @@ Cube is the "canonical" stats ontology adopted by W3C. It can work together or w
 <p>
 There are many important parts to the specification, but we highlight only a couple in this section, and a more technical one in the next section.
 </p>
-<ul class="org-ul">
-<li><a href="http://www.w3.org/TR/vocab-data-cube/#dsd-mm">Multiple Measures</a>: If you need Observations that have several different Measures, there are several approaches:
+<dl class="org-dl">
+<dt> <a href="http://www.w3.org/TR/vocab-data-cube/#dsd-mm">Multiple Measures</a> </dt><dd>  If you need Observations that have several different Measures, there are several approaches:
 <ul class="org-ul">
 <li><a href="http://www.w3.org/TR/vocab-data-cube/#h4_dsd-mm-obs">Multi-measure observations</a>. Each observation has the same set of measures, and attributes can't be applied separately.
 <div class="org-src-container">
@@ -1304,8 +1304,8 @@ Different attributes can be applied. This is a more regular approach, recommende
 </div>
 </li>
 </ul>
-</li>
-<li><a href="http://www.w3.org/TR/vocab-data-cube/#dsd-dsd">Data Structure Definition</a> (DSD): the structure of a Cube is described with a DSD.
+</dd>
+<dt> <a href="http://www.w3.org/TR/vocab-data-cube/#dsd-dsd">Data Structure Definition</a> (DSD) </dt><dd>  The structure of a Cube is described with a DSD.
 The same DSD is normally reused between many Cubes with the same structure
 (eg a SNB DSD will be used by the stats cubes of all SNB Runs).
 A DSD is created by listing the qb:components that apply to a cube, and optionally defining <a href="http://www.w3.org/TR/vocab-data-cube/#slices">SliceKeys</a>.
@@ -1321,13 +1321,13 @@ Consistent naming of different kinds of components (eg dim, attr, meas) is essen
   <span style="color: #228b22;">ob:</span><span style="color: #008b8b;">component</span> <span style="color: #228b22;">[qb:</span><span style="color: #008b8b;">measure</span>   <span style="color: #228b22;">bm-stat:</span><span style="color: #008b8b;">measDelayTime]</span>.   <span style="color: #b22222;"># observe DelayTime</span>
 </pre>
 </div>
-</li>
-<li><b>componentAttachment</b>: every Observation must have defined values for all Dimensions and all mandatory Attributes.
+</dd>
+<dt> componentAttachment </dt><dd>  Every Observation must have defined values for all Dimensions and all mandatory Attributes.
 However, Cube allows some shortcuts by letting you specify a Dimension/Attribute
 at the level of the cube, slice, or a Measure.
 This last option is unclear in the spec, see my <a href="https://groups.google.com/forum/#!topic/publishing-statistical-data/NZcaUhMu0_k">forum posting</a> and the next section.
-</li>
-</ul>
+</dd>
+</dl>
 </div>
 </div>
 
@@ -1451,8 +1451,7 @@ Id: qb2_Measure_property_attachments
   measure &lt;rdf:type&gt; &lt;qb:MeasureProperty&gt;
   measure comp value
   obs     &lt;qb:dataSet&gt; dataset
-  obs     measure struc
-  struc
+  obs     measure blank
   --------------------------
   obs  comp value
 </pre>
@@ -1461,10 +1460,10 @@ In addition, it adds an inverse propertyChainAxiom for the loop between DataSet,
 </p>
 <pre class="example">
 Id: qbX_slice_observation_dataSet
-  dataset &lt;qb:slice&gt; slice
-  slice &lt;qb:observation&gt; obs
-  --------------------------
-  obs &lt;qb:dataSet&gt; dataset
+  dataset &lt;qb:slice&gt;       slice
+  slice   &lt;qb:observation&gt; obs
+  --------------------------------
+  obs     &lt;qb:dataSet&gt;     dataset
 </pre>
 <p>
 This allows you to skip <code>qb:dataSet</code> for an Observation that's already attached to a Slice of the cube using <code>qb:observation</code>.
@@ -1930,7 +1929,7 @@ The BM Stat Ontology <a href="./bm-stat.ttl">./bm-stat.ttl</a> defines common st
 <p class="date">Date: 2015-01-21</p>
 <p class="author">Author: Vladimir Alexiev, Ontotext Corp</p>
 <p class="email">Email: <a href="mailto:vladimir.alexiev@ontotext.com">vladimir.alexiev@ontotext.com</a></p>
-<p class="date">Created: 2015-01-21 Wed 02:49</p>
+<p class="date">Created: 2015-01-21 Wed 03:20</p>
 <p class="creator">Proudly made with: Emacs 24.3.91.1 (Org mode 8.2.7c)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>

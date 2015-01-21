@@ -341,7 +341,8 @@ Cube is the "canonical" stats ontology adopted by W3C. It can work together or w
 - forum: https://groups.google.com/forum/#!topic/publishing-statistical-data
 
 There are many important parts to the specification, but we highlight only a couple in this section, and a more technical one in the next section.
-- [[http://www.w3.org/TR/vocab-data-cube/#dsd-mm][Multiple Measures]]: If you need Observations that have several different Measures, there are several approaches:
+- [[http://www.w3.org/TR/vocab-data-cube/#dsd-mm][Multiple Measures]] ::
+  If you need Observations that have several different Measures, there are several approaches:
   - [[http://www.w3.org/TR/vocab-data-cube/#h4_dsd-mm-obs][Multi-measure observations]]. Each observation has the same set of measures, and attributes can't be applied separately.
     #+BEGIN_SRC Turtle
   eg:o1 a ob:Observation;
@@ -367,7 +368,8 @@ There are many important parts to the specification, but we highlight only a cou
     eg:attrUnit unit:MilliSecond;
     eg:measure [eg:value1 123; eg:value2 456].
     #+END_SRC
-- [[http://www.w3.org/TR/vocab-data-cube/#dsd-dsd][Data Structure Definition]] (DSD): the structure of a Cube is described with a DSD.
+- [[http://www.w3.org/TR/vocab-data-cube/#dsd-dsd][Data Structure Definition]] (DSD) ::
+  The structure of a Cube is described with a DSD.
   The same DSD is normally reused between many Cubes with the same structure
   (eg a SNB DSD will be used by the stats cubes of all SNB Runs).
   A DSD is created by listing the qb:components that apply to a cube, and optionally defining [[http://www.w3.org/TR/vocab-data-cube/#slices][SliceKeys]].
@@ -381,7 +383,8 @@ snb-stat:dsd a qb:DataStructureDefinition;
   ob:component [qb:measure   bm-stat:measRuntime],     # observe Runtime, or
   ob:component [qb:measure   bm-stat:measDelayTime].   # observe DelayTime
   #+END_SRC
-- *componentAttachment*: every Observation must have defined values for all Dimensions and all mandatory Attributes.
+- componentAttachment ::
+  Every Observation must have defined values for all Dimensions and all mandatory Attributes.
   However, Cube allows some shortcuts by letting you specify a Dimension/Attribute
   at the level of the cube, slice, or a Measure.
   This last option is unclear in the spec, see my [[https://groups.google.com/forum/#!topic/publishing-statistical-data/NZcaUhMu0_k][forum posting]] and the next section.
@@ -469,18 +472,17 @@ Eg the *Measure property attachments* INSERT WHERE rule from the previous sectio
     measure <rdf:type> <qb:MeasureProperty>
     measure comp value
     obs     <qb:dataSet> dataset
-    obs     measure struc
-    struc
+    obs     measure blank
     --------------------------
     obs  comp value
 #+END_SRC
 In addition, it adds an inverse propertyChainAxiom for the loop between DataSet, Slice and Observation (see the Cube [[http://www.w3.org/TR/vocab-data-cube/#outline][domain model]]):
 #+BEGIN_SRC
   Id: qbX_slice_observation_dataSet
-    dataset <qb:slice> slice
-    slice <qb:observation> obs
-    --------------------------
-    obs <qb:dataSet> dataset
+    dataset <qb:slice>       slice
+    slice   <qb:observation> obs
+    --------------------------------
+    obs     <qb:dataSet>     dataset
 #+END_SRC
 This allows you to skip ~qb:dataSet~ for an Observation that's already attached to a Slice of the cube using ~qb:observation~.
 
