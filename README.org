@@ -1,7 +1,8 @@
 #+TITLE: LDBC Benchmarking Ontology
-#+DATE: 2015-01-21
+#+DATE: 2015-02-02
 #+AUTHOR: Vladimir Alexiev, Ontotext Corp
 #+EMAIL: vladimir.alexiev@ontotext.com
+#+STARTUP: content
 #+OPTIONS: ':nil *:t -:t ::t <:t H:4 \n:nil ^:{} arch:headline author:t c:nil
 #+OPTIONS: creator:comment d:(not "LOGBOOK") date:t e:t email:t f:t inline:t num:t
 #+OPTIONS: p:nil pri:nil stat:t tags:t tasks:t tex:nil timestamp:t toc:4 todo:t |:t
@@ -31,6 +32,7 @@ Following partner priorities, we start by describing Result Statistics, which is
 
 ** Revisions
 - <2015-01-21>: initial version. Overview of prefixes, potential benchmarks. Stat ontologies, Cube, SPB Sample1, BM Stat initial
+- <2015-02-02>: added discussion on Benchmark Result Dimensions [[Benchmark Result Dimensions]]
 - NEXT: SPB Stat sample
 ** Prefixes
 All the prefixes we use are in [[./prefixes.ttl]] and should be:
@@ -179,7 +181,7 @@ Update description & links
 - sample test run results. Would be best if you have from two different systems
 - SNB spec https://github.com/ldbc/ldbc_snb_docs/blob/master/LDBC_SNB_v0.1.5.pdf
 - SNB Interactive Workload design doc (http://ldbc.eu/sites/default/files/LDBC_D3.3.34.pdf)
-- SNB Full Disclosure Report (attached)
+- SNB Full Disclosure: full_disclosure.txt and supporting_files/
 - SNB interactive workload mix (first section of http://ldbc.eu/sites/default/files/LDBC_D2.2.3_final.pdf)
 ** BSBM 3.1
 - spec 3.1: http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/index.html
@@ -281,6 +283,7 @@ DDI Controlled Vocabularies provides a number of codelists for common stats conc
 - homepage: http://www.ddialliance.org/controlled-vocabularies
 - formats: http://www.ddialliance.org/Specification/DDI-CV/
 - RDF format: https://github.com/linked-statistics/DDI-controlled-vocabularies
+**** Summary Statistics
 In particular, Summary Statistics is relevant for us:
 - A Summary Statistic is a single number representation of the characteristics of a set of values
 - Amongst others, defines: ArithmeticMean, Minimum, Maximum, Median (50 percentile), NinthDecile (90 percentile), OtherPercentile
@@ -488,6 +491,46 @@ This allows you to skip ~qb:dataSet~ for an Observation that's already attached 
 
 Note: "qb2" stands for "Cube Phase2 normalization", and "qbX" stands for "I'm too lazy to repeat myself".
 
+*** Benchmark Result Dimensions
+We will document all particulars of a benchmark run in ~bm:Run~, including:
+- Full hardware and software details of the System Under Test
+- URLs of configuration files of the System Under Test, test driver, etc
+- RDF nodes with property-value for important configuration parameters
+In contrast, the Benchmark Result examples (eg [[SNB Turtle]] below) as of <2015-01-21> use a really minimal set of dimensions:
+- ~dimQuery~ states which query (or Total) the measurement pertains to
+- ~dimStat~ states which Summary Statistic [[Summary Statistics]] (eg mean, min, max) is expressed by the measurement
+To compare or chart numbers across different Runs (varying eg database, release, database settings, hardware, benchmark version), 
+we need to use more of the Run parameters as cube Dimensions.
+
+The down-side of every dimension is that it not only adds a triple to every observation,
+but also multiplies the number of observations through Cube Normalization [[Cube Normalization]].
+Eg assume you have a cube with D dimensions, O observations and (D+X)*O triples (where X is proportional to the number of measures and attributes)
+and you add an D+1'th dimension with Y values.
+You'll end up with O*Y observations and (D+X+1)*O*Y triples.
+ 
+So what are the important benchmark Run parameters to add as Dimensions? Currently proposed:
+- scaleFactor: to compare performance against dataset size
+- database release: to compare the evolution of a database in time
+- database: to compare across databases (note: this is implied by "database release", so we could spare it)
+- RAM size (Gb): a key hardware parameter
+
+How about these?
+- Loading parameters such as number of agents/threads (SNB threadCount), SNB timeCompressionRatio, SNB gctDeltaDuration. 
+  IMHO the benchmark sponsor is supposed to optimize these until maximum database performance is achieved, so we don't compare across them
+- CPU and Disk performance. But is there a standardized way to report them?
+- query mix, eg which queries are enabled, whether analytical queries were included, query interleave times, etc.
+  The number and times for each query type are reported through ~dimQuery~, 
+  but the mix as a whole also affects the performance of each query, so maybe we need to capture this.
+  But how? A query mix is a complex structure in itself...
+- SUT platform such as operating system, JVM etc: it's possible (but maybe not very likely) we'd want to compare against such factors
+- Total SUT price. TCP captures that (and queries per second per dollar), so maybe we should too
+
+In contrast, we don't need to capture the folowing as Dimensions:
+- benchmark: can't compare across benchmarks (can't compare apples to oranges)
+- benchmark version: this is a key parameter of a Run, but again we can't compare apples to oranges
+- driver version: an important parameter of a Run, but it's not supposed to affect benchmark performance
+- dataset parameters such as dictionaries used, network distributions, literal distributions, etc.
+
 ** SNB Sample1
 The SNB spec [[https://github.com/ldbc/ldbc_snb_docs/blob/master/LDBC_SNB_v0.2.0.pdf][LDBC_SNB_v0.2.0]] sec 3.3 "Gathering the results" provides the example [[./snb-sample1.json]]:
 #+BEGIN_SRC js
@@ -592,11 +635,8 @@ snb-run:sample1-sliceResult a qb:Slice;
 I hope this representation fairly obviously corresponds to the JSON. *Please comment*.
 
 Possible extensions:
-- Above we have a really minimal set of dimensions (Query). We may well want to also
-  track: scaleFactor, database, query mix, benchmark version, etc. True, all these are
-  captured at the Run level, but to compare numbers between different Runs, we need to
-  push them into the cube.
-- Might need some hierarchical dimension logic to capture the relation between Query Mix and individual Queries
+- More dimensions, see [[Benchmark Result Dimensions]]
+- May need some hierarchical dimension logic to capture the relation between Query Mix and individual Queries
 
 Converting from JSON to Turtle should not be hard.
 We might even be able to convert automatically by using a JSONLD Context, but I have not tried it.
@@ -656,8 +696,8 @@ select ?query ?mean ?min ?max ?fulfillmentRatio {
 - Note: op:numeric-divide() is xsd:decimal if both operands are xsd:integer, so we don't need to coerce to decimal
 - TODO: check how the UNION behaves
 *** SNB Stat Ontology
-[[./snb-stat.ttl]] is based on the [[BM%20Stat%20Ontology][BM Stat Ontology]], and includes some Stat things that are specific to SNB
-(we could decide to move into [[BM%20Stat%20Ontology][BM Stat Ontology]] to keep the benchmarks-specific ontology minimal).
+[[./snb-stat.ttl]] is based on BM Stat [[BM%20Stat%20Ontology][BM Stat Ontology]], and includes some Stat things that are specific to SNB
+(we could decide to move it into BM Stat to keep the benchmarks-specific ontology minimal).
 
 First a more specific Dimension that inherits all fields from ~bm-stat:dimQuery~ but fixes the range to ~snb:Query~. 
 This allows checking that the right query is used in SNB cubes, but that's little gain. 
@@ -736,6 +776,7 @@ semantic_publishing_benchmark_results.log is a simple text format like this:
 - "Completed query mixes" is just about equal to the minimum of counts per query (a mix is counted Completed if each query was executed once)
 - Number of errors: total for update operations; per query for read operations
 - Average, min, max MilliSeconds per operation (90, 90, 99 percentiles will also be added)
+[[./spb-sample1.txt]]:
 #+BEGIN_EXAMPLE
 960260 : 
 
